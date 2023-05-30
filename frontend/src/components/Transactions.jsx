@@ -45,7 +45,8 @@ function Transactions() {
         Total amount paid:
         $
         {
-        data.reduce((total, transaction) => total + parseFloat(transaction.amount), 2, 0).toFixed(2)
+        data.reduce((total, transaction) => total + parseFloat(transaction.amount), 0, 0).toFixed(2)
+        // data.reduce((total, transaction) => total + transaction.amount)
       }
       </h4>
     </>

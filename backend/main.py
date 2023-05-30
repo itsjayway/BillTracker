@@ -64,7 +64,7 @@ def get_all_bills():
 def create_bill():
     data = request.get_json()
     data["shown"] = 1
-    print(data)
+    data["overdue"] = 1
     connection = pymongo.MongoClient("mongodb://localhost:27017")
     db = connection["BILL_TRACKER"]
     collection = db["COMPANIES"]
@@ -138,10 +138,25 @@ def pay_bill():
 
     bill = find_bill(account_id)
 
-    print("Bill: ", bill)
+    # print("Bill: ", bill)
     # update the bill's due date to the next month
     due_date = datetime.strptime(bill["due_date"], "%m/%d/%Y")
-    due_date = due_date.replace(month=due_date.month + 1)
+    next_month = due_date.month + 1
+    curr_day = due_date.day
+    if next_month > 12:
+        next_month = 1
+    replace_day = 28
+    if next_month != 2:
+        if curr_day not in [30, 31]:
+            if next_month in [1,3,5, 7, 9, 10, 12]:
+                replace_day = 31
+            else:
+                replace_day = 30
+    print(due_date)
+    print(next_month, replace_day)
+    due_date = due_date.replace(day=1)
+    due_date = due_date.replace(month=next_month)
+    due_date = due_date.replace(day=replace_day)
     due_date = due_date.strftime("%m/%d/%Y")
 
     collection.update_one({"account_id": account_id}, {"$set": {"due_date": due_date}})
