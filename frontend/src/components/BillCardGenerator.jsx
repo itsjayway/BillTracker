@@ -25,6 +25,8 @@ function BillCardGenerator() {
     <BillCard
       // eslint-disable-next-line no-underscore-dangle
       key={bill._id}
+      // eslint-disable-next-line no-underscore-dangle
+      _id={bill._id}
       account_id={bill.account_id}
       due_date={bill.due_date}
       name={bill.name}

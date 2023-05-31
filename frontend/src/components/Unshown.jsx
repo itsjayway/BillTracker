@@ -57,8 +57,12 @@ function Unshown() {
                 >
                   {bill.payments}
                   {' '}
-                  Total: $
-                  {bill.total_paid}
+                  <i>
+                    <b>
+                      Total: $
+                      {bill.total_paid}
+                    </b>
+                  </i>
                 </td>
                 <td
                   style={{ whiteSpace: 'pre-wrap' }}

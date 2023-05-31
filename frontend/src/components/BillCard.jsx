@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
@@ -8,15 +9,25 @@ import InputGroup from 'react-bootstrap/InputGroup';
 // import Col from 'react-bootstrap/esm/Col';
 
 function BillCard(props) {
-  const [show, setShow] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handlePaymentClose = () => setShowPaymentModal(false);
+  const handlePaymentShow = () => setShowPaymentModal(true);
 
-  const [submitShown, setSubmitShown] = useState(false);
+  const handleEditClose = () => setShowEditModal(false);
+  const handleEditShow = () => setShowEditModal(true);
+
+  const [submitPaymentShown, setSubmitPaymentShown] = useState(false);
+  const [submitEditShown, setSubmitEditShown] = useState(false);
 
   const [amount, setAmount] = useState(0);
   const [notes, setNotes] = useState('');
+
+  const [editName, setEditName] = useState('');
+  const [editAccountId, setEditAccountId] = useState('');
+  const [editDueDate, setEditDueDate] = useState('');
+  const [editURL, setEditURL] = useState('');
 
   const data = { ...props };
   const dateColor = data.overdue === 1 ? 'e743c3' : '0';
@@ -40,7 +51,7 @@ function BillCard(props) {
       });
   };
 
-  const handleSubmit = () => {
+  const handlePaymentSubmit = () => {
     const postData = {
       account_id: data.account_id,
       amount,
@@ -59,11 +70,125 @@ function BillCard(props) {
       .then(() => {
         window.location.reload();
       });
-    handleClose();
+    handlePaymentClose();
   };
 
+  const handleEditSubmit = () => {
+    const postData = {
+      // eslint-disable-next-line no-underscore-dangle
+      _id: data._id,
+      name: editName,
+      account_id: editAccountId,
+      due_date: editDueDate,
+    };
+
+    fetch('/edit_bill', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData),
+      redirect: 'follow',
+    })
+      .then((response) => response.json())
+      .then(() => {
+        window.location.reload();
+      });
+  };
+
+  const editModal = (
+    <Modal show={showEditModal} onHide={handleEditClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>
+          Editting
+          {' '}
+          {data.name}
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleEditSubmit}>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>ObjectId</InputGroup.Text>
+            <Form.Control
+              aria-label="Account #"
+              disabled
+              // eslint-disable-next-line no-underscore-dangle
+              value={data._id}
+            />
+          </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              Name (
+              {data.name}
+              ):
+            </InputGroup.Text>
+            <Form.Control
+              aria-label="Account #"
+              onChange={(e) => setEditName(e.target.value)}
+              placeholder={data.name}
+            />
+          </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              URL (
+              {`${data.url?.slice(0, 20)}...`}
+              ):
+            </InputGroup.Text>
+            <Form.Control
+              aria-label="URL"
+              onChange={(e) => setEditURL(e.target.value)}
+              placeholder={data.url}
+            />
+          </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>
+              Account # (
+              {data.account_id}
+              ):
+            </InputGroup.Text>
+            <Form.Control
+              aria-label="Account #"
+              onChange={(e) => setEditAccountId(e.target.value)}
+              placeholder={data.account_id}
+            />
+          </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>{`Next Due Date (${data.due_date}):`}</InputGroup.Text>
+            <Form.Control
+              type="date"
+              aria-label="Next Due Date"
+              placeholder={data.due_date}
+              onChange={(e) => setEditDueDate(e.target.value)}
+            />
+          </InputGroup>
+
+          <Form.Group className="mb-3" controlId="formBasicCheckbox">
+            <Form.Check
+              type="checkbox"
+              label="Confirm changes"
+              onChange={() => setSubmitEditShown(!submitEditShown)}
+            />
+          </Form.Group>
+
+          {submitEditShown && (
+            <Button variant="primary" type="submit">
+              Submit
+            </Button>
+          )}
+        </Form>
+        <Modal.Footer>
+          <h4>
+            Today is
+            {' '}
+            {`${new Date().toLocaleDateString()}`}
+          </h4>
+        </Modal.Footer>
+      </Modal.Body>
+    </Modal>
+  );
+
   const paymentModal = (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={showPaymentModal} onHide={handlePaymentClose}>
       <Modal.Header closeButton>
         <Modal.Title>{data.name}</Modal.Title>
       </Modal.Header>
@@ -72,20 +197,17 @@ function BillCard(props) {
           Account Number:
           {' '}
           {data.account_id}
-
         </p>
         <p>
           Due Date:
           {' '}
           {data.due_date}
           {' '}
-          -
-          {' '}
-          (
+          - (
           {data.overdue ? 'OVERDUE' : 'ON-TIME'}
           )
         </p>
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handlePaymentSubmit}>
           <InputGroup className="mb-3">
             <InputGroup.Text>$</InputGroup.Text>
             <Form.Control
@@ -105,15 +227,14 @@ function BillCard(props) {
             <Form.Check
               type="checkbox"
               label="Confirm payment"
-              onChange={() => setSubmitShown(!submitShown)}
+              onChange={() => setSubmitPaymentShown(!submitPaymentShown)}
             />
           </Form.Group>
 
-          { submitShown
-          && (
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
+          {submitPaymentShown && (
+            <Button variant="primary" type="submit">
+              Submit
+            </Button>
           )}
         </Form>
         <Modal.Footer>
@@ -129,21 +250,17 @@ function BillCard(props) {
   return (
     <>
       {paymentModal}
-
-      <Card
-        key={data.key}
-        style={{ width: '18rem', margin: '2em' }}
-      >
+      {editModal}
+      <Card key={data.key} style={{ width: '18rem', margin: '2em' }}>
         <Card.Header style={{ display: 'flex' }}>
           {data.name}
           {' '}
           <span style={{ marginLeft: 'auto' }}>
-            <Button
-              variant="gray"
-              onClick={handleDelete(data.account_id)}
-            >
+            <Button variant="gray" onClick={handleEditShow}>
+              <b>...</b>
+            </Button>
+            <Button variant="gray" onClick={handleDelete(data.account_id)}>
               X
-
             </Button>
           </span>
         </Card.Header>
@@ -157,7 +274,11 @@ function BillCard(props) {
             <span style={{ color: `#${dateColor}` }}>{data.due_date}</span>
           </Card.Title>
 
-          <Card.Link href={data.url} onClick={handleShow} target="_blank">
+          <Card.Link
+            href={data.url}
+            onClick={handlePaymentShow}
+            target="_blank"
+          >
             Pay
           </Card.Link>
         </Card.Body>
