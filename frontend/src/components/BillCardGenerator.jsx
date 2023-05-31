@@ -31,7 +31,7 @@ function BillCardGenerator() {
   });
 
   return (
-    <Container fluid>
+    <Container id="gen-container">
       <Row>{billArray}</Row>
     </Container>
   );

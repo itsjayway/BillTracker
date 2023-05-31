@@ -102,7 +102,6 @@ def get_transactions(bill_id):
     for transaction in collection.find({"bill_id": bill_id}):
         transaction["_id"] = str(transaction["_id"])
         transactions.append(transaction)
-
     return transactions
 
 
@@ -116,7 +115,7 @@ def get_all_transactions():
     for transaction in collection.find():
         transaction["_id"] = str(transaction["_id"])
         transactions.append(transaction)
-
+    transactions.reverse()
     return jsonify({"transactions": transactions})
 
 
@@ -145,15 +144,19 @@ def pay_bill():
     curr_day = due_date.day
     if next_month > 12:
         next_month = 1
-    replace_day = 28
-    if next_month != 2:
-        if curr_day not in [30, 31]:
-            if next_month in [1,3,5, 7, 9, 10, 12]:
-                replace_day = 31
-            else:
-                replace_day = 30
-    print(due_date)
-    print(next_month, replace_day)
+
+    # handle last days of the month
+    replace_day = due_date.day
+    if (replace_day == 30 and next_month in [1,3,5,7,9,10,12]):
+        replace_day = 31
+    elif (replace_day == 31 and next_month in [2,4,6,8,11]):
+        if next_month == 2:
+            replace_day = 28
+        else:
+            replace_day = 30
+    elif (replace_day in [28,29] and next_month == 3):
+        replace_day = 31
+        
     due_date = due_date.replace(day=1)
     due_date = due_date.replace(month=next_month)
     due_date = due_date.replace(day=replace_day)

@@ -26,5 +26,10 @@ code {
   margin: 0 25px;
   overflow-y: scroll;
   height: 80vh;
-  max-height: 100vh;
+  max-height: 100vh; 
+}
+
+#gen-container {
+  border: gray solid 2px;
+  overflow-y: scroll; 
 }
