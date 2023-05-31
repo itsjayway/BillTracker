@@ -12,8 +12,6 @@ app = Flask(__name__)
 CLIENT = pymongo.MongoClient("mongodb://localhost:27017")
 
 
-# bill tracking app that will query local MongoDB database
-# the collection is called Bill_Tracker and the records will be in Companies
 @app.route("/")
 def hello_world():
     return "<h1>Hello world</h1>"
@@ -49,14 +47,11 @@ def get_all_bills():
                 )
                 company["overdue"] = 1
         else:
-            # try:
-            print(company)
             if company["overdue"]:
                 collection.update_one(
                     {"_id": ObjectId(company["_id"])}, {"$set": {"overdue": 0}}
                 )
-            # except:
-            #     print("Unknown case")
+    print("companies", companies)
     return companies
 
 
@@ -126,7 +121,6 @@ def pay_bill():
     db = connection["BILL_TRACKER"]
     collection = db["COMPANIES"]
 
-    print(data)
     account_id = data["account_id"]
 
     def find_bill(account_id):
@@ -225,19 +219,34 @@ def get_transactions_between_dates():
     db = connection["BILL_TRACKER"]
     collection = db["TRANSACTIONS"]
 
-    start_date = data["start_date"]
-    end_date = (
-        data["end_date"] if data["end_date"] else datetime.now().strftime("%m/%d/%Y")
+    begin_date = data["beginDate"]
+    end_date = data["endDate"]
+
+    def convert_if_necessary(in_date, which=0):
+        if not in_date:
+            return (
+                datetime.max.date().strftime("%m/%d/%Y")
+                if which
+                else datetime.min.date().strftime("%m/%d/%Y")
+            )
+        else:
+            return datetime.strptime(in_date, "%Y-%m-%d").date().strftime("%m/%d/%Y")
+
+    begin_date, end_date = convert_if_necessary(begin_date), convert_if_necessary(
+        end_date, 1
     )
 
+    # print(f"==============={begin_date} -> {end_date}===============")
+
     transactions = []
+
     for transaction in collection.find(
-        {"date": {"$gte": start_date, "$lte": end_date}}
+        {"date": {"$gte": begin_date, "$lte": end_date}}
     ):
         transaction["_id"] = str(transaction["_id"])
         transactions.append(transaction)
-    transactions.reverse()
 
+    transactions.reverse()
     return jsonify({"transactions": transactions})
 
 

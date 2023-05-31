@@ -4,12 +4,19 @@ import { Table } from 'antd';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 function Transactions() {
   const [data, setData] = useState([{}]);
+  // eslint-disable-next-line no-unused-vars
   const [beginDate, setBeginDate] = useState('');
+  // eslint-disable-next-line no-unused-vars
   const [endDate, setEndDate] = useState('');
   const [trigger, setTrigger] = useState(false);
+
+  const [dataSource, setDataSource] = useState([]);
 
   const columns = [
     {
@@ -38,28 +45,18 @@ function Transactions() {
       key: 'notes',
     },
   ];
-  let dataSource;
 
-  const updateDataSource = (newData) => {
-    dataSource = newData.map((transaction) => ({
-      key: transaction._id,
+  useEffect(() => {
+    setDataSource(data.map((transaction, index) => ({
+      // eslint-disable-next-line no-underscore-dangle
+      key: `${transaction.account_id}-${index + 1}`,
       name: transaction.name,
       amount: transaction.amount,
       date: transaction.date,
       time: transaction.time,
       notes: transaction.notes,
-    }));
-  };
-
-  useEffect(() => {
-    fetch('/get_all_transactions')
-      .then((response) => response.json())
-      .then((result) => {
-        setData(result.transactions);
-      });
-
-    updateDataSource(data);
-  }, [trigger]);
+    })));
+  }, [data]);
 
   useEffect(() => {
     fetch('/get_transactions_between_dates', {
@@ -76,71 +73,58 @@ function Transactions() {
       .then((result) => {
         setData(result.transactions);
       });
-
-    updateDataSource(data);
   }, [beginDate, endDate]);
 
   return (
     <>
+
       <Form>
 
-        <Form.Label>Begin Date</Form.Label>
-        <Form.Control
-          type="date"
-          name="beginDate"
-          onChange={(e) => setBeginDate(e.target.value)}
-        />
-
-        <Form.Label>End Date</Form.Label>
-        <Form.Control
-          type="date"
-          name="endDate"
-          onChange={(e) => setEndDate(e.target.value)}
-        />
+        <Container>
+          <Row>
+            <Col>
+              <Form.Label>Begin Date</Form.Label>
+              <Form.Control
+                type="date"
+                name="beginDate"
+                value={beginDate}
+                onChange={(e) => setBeginDate(e.target.value)}
+              />
+            </Col>
+            <Col>
+              <Form.Label>End Date</Form.Label>
+              <Form.Control
+                type="date"
+                name="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </Col>
+            <Col>
+              <Button
+                variant="primary"
+                type="submit"
+                onClick={() => {
+                  setBeginDate('');
+                  setEndDate('');
+                  setTrigger(!trigger);
+                }}
+              >
+                Clear
+              </Button>
+            </Col>
+          </Row>
+        </Container>
       </Form>
       {/* button to clear dates, set beginDate and endDate to '' and fetch all transactions */}
-      <Button
-        variant="primary"
-        type="submit"
-        onClick={() => {
-          setBeginDate('');
-          setEndDate('');
-          setTrigger(!trigger);
-        }}
-      >
-        Clear
-
-      </Button>
 
       <h3>Transaction History</h3>
-      {/* {data.length > 0 && (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((transaction) => (
-          // eslint-disable-next-line no-underscore-dangle
-            <tr key={transaction._id}>
-              <td>{transaction.name}</td>
-              <td>{transaction.amount}</td>
-              <td>{transaction.date}</td>
-              <td>{transaction.time}</td>
-              <td>{transaction.notes}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-      )} */}
-
       {data.length > 0 && (
-      <Table dataSource={dataSource} columns={columns} />
+        <Table
+          dataSource={dataSource}
+          columns={columns}
+          pagination={{ pageSize: 5 }}
+        />
       )}
 
       <h4>
