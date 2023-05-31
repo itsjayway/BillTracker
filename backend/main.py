@@ -17,8 +17,9 @@ def hello_world():
     return "<h1>Hello world</h1>"
 
 
-@app.route("/get_all_bills")
+@app.route("/get_all_bills", methods=["POST"])
 def get_all_bills():
+    data = request.get_json()
     connection = pymongo.MongoClient("mongodb://localhost:27017")
     db = connection["BILL_TRACKER"]
     collection = db["COMPANIES"]
@@ -36,22 +37,40 @@ def get_all_bills():
     now = datetime.now().strftime("%m/%d/%Y")
 
     # check every bill and update if it's overdue
+    collection = db["TRANSACTIONS"]
     for company in companies:
+        if data["summary"]:
+            # aggregate the most recent transaction and add it as a field to the company
+            transaction = collection.find_one(
+                {"account_id": company["account_id"]}, sort=[("_id", -1)]
+            )
+            if transaction:
+                company["last_transaction"] = {
+                    "amount": transaction["amount"],
+                    "date": transaction["date"],
+                    "notes": transaction["notes"] if "notes" in transaction else "",
+                }
+            else:
+                company["last_transaction"] = {
+                    "amount": 0,
+                    "date": "No transactions",
+                    "notes": transaction["notes"] if "notes" in transaction else "",
+                }
+
         if company["due_date"] <= now:
-            try:
-                if company["overdue"]:
-                    continue
-            except:
+            if company["overdue"] == 1:
+                continue
+            else:
                 collection.update_one(
                     {"_id": ObjectId(company["_id"])}, {"$set": {"overdue": 1}}
                 )
-                company["overdue"] = 1
+            company["overdue"] = 1
         else:
             if company["overdue"]:
                 collection.update_one(
                     {"_id": ObjectId(company["_id"])}, {"$set": {"overdue": 0}}
                 )
-    print("companies", companies)
+        print(company)
     return companies
 
 
@@ -190,11 +209,34 @@ def delete_bill():
 def get_hidden_bills():
     connection = pymongo.MongoClient("mongodb://localhost:27017")
     db = connection["BILL_TRACKER"]
-    collection = db["COMPANIES"]
+    company_collection = db["COMPANIES"]
+    transactions_collection = db["TRANSACTIONS"]
 
     companies = []
 
-    for company in collection.find({"shown": 0}):
+    for company in company_collection.find({"shown": 0}):
+        # get the total amount paid toward this bill from the transcations collection
+        total_paid = 0
+        count = 0
+        notes = ""
+        payments = ""
+        for transaction in transactions_collection.find(
+            {"account_id": company["account_id"]}
+        ):
+            count += 1
+            total_paid += float(transaction["amount"])
+            company["last_paid_date"] = transaction["date"]
+            if "notes" in transaction:
+                notes += transaction["date"] + "\t-\t" + transaction["notes"] + "\n"
+            if "amount" in transaction:
+                payments += (
+                    transaction["date"] + "\t-\t$" + transaction["amount"] + "\n"
+                )
+
+        company["payments"] = payments
+        company["total_paid"] = total_paid
+        company["notes"] = notes
+        company["transaction_count"] = count
         company["_id"] = str(company["_id"])
         companies.append(company)
 

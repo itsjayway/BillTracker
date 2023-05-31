@@ -130,7 +130,10 @@ function BillCard(props) {
     <>
       {paymentModal}
 
-      <Card style={{ width: '18rem', margin: '2em' }}>
+      <Card
+        key={data.key}
+        style={{ width: '18rem', margin: '2em' }}
+      >
         <Card.Header style={{ display: 'flex' }}>
           {data.name}
           {' '}

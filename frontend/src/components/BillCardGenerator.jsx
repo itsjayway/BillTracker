@@ -8,14 +8,23 @@ function BillCardGenerator() {
   const [bills, setBills] = useState([{}]);
 
   useEffect(() => {
-    fetch('/get_all_bills')
+    fetch('/get_all_bills', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        summary: false,
+      }),
+    })
       .then((response) => response.json())
       .then((data) => setBills(data));
   }, []);
 
-  const billArray = bills.map((bill, index) => (
+  const billArray = bills.map((bill) => (
     <BillCard
-      key={`card-${index + 1}`}
+      // eslint-disable-next-line no-underscore-dangle
+      key={bill._id}
       account_id={bill.account_id}
       due_date={bill.due_date}
       name={bill.name}

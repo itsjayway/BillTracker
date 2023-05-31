@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 
 function Unshown() {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
   const [data, setData] = useState({});
 
   const toggleShow = () => {
@@ -33,20 +33,39 @@ function Unshown() {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Amount</th>
-              <th>Due Date</th>
               <th>Account #</th>
+              <th># of Transactions</th>
+              <th>Payments</th>
+              <th>Total Amount Paid</th>
+              <th>Last Note</th>
               <th>Put back?</th>
             </tr>
           </thead>
           <tbody>
-            {data.companies.map((bill) => (
+            {data.companies?.map((bill) => (
               // eslint-disable-next-line no-underscore-dangle
               <tr key={bill._id}>
                 <td>{bill.name}</td>
-                <td>{bill.amount}</td>
                 <td>{bill.account_id}</td>
-                <td>{bill.due_date}</td>
+                <td>{bill.transaction_count}</td>
+                <td>{bill.last_paid_date}</td>
+                <td
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                    width: '400px',
+                  }}
+                >
+                  {bill.payments}
+                  {' '}
+                  Total: $
+                  {bill.total_paid}
+                </td>
+                <td
+                  style={{ whiteSpace: 'pre-wrap' }}
+                >
+                  {bill.notes}
+
+                </td>
                 <td>
                   <Button
                     variant="primary"
