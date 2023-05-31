@@ -22,11 +22,11 @@ def get_all_bills():
     data = request.get_json()
     connection = pymongo.MongoClient("mongodb://localhost:27017")
     db = connection["BILL_TRACKER"]
-    collection = db["COMPANIES"]
+    company_collection = db["COMPANIES"]
 
     companies = []
     # find all companies whose shown value is 1
-    for company in collection.find({"shown": {"$ne": 0}}):
+    for company in company_collection.find({"shown": {"$ne": 0}}):
         company["_id"] = str(company["_id"])
         companies.append(company)
 
@@ -37,11 +37,11 @@ def get_all_bills():
     now = datetime.now().strftime("%m/%d/%Y")
 
     # check every bill and update if it's overdue
-    collection = db["TRANSACTIONS"]
+    transaction_collection = db["TRANSACTIONS"]
     for company in companies:
         if data["summary"]:
             # aggregate the most recent transaction and add it as a field to the company
-            transaction = collection.find_one(
+            transaction = transaction_collection.find_one(
                 {"account_id": company["account_id"]}, sort=[("_id", -1)]
             )
             if transaction:
@@ -54,7 +54,7 @@ def get_all_bills():
                 company["last_transaction"] = {
                     "amount": 0,
                     "date": "No transactions",
-                    "notes": transaction["notes"] if "notes" in transaction else "",
+                    "notes": "",
                 }
 
         if company["due_date"] <= now:

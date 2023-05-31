@@ -1,4 +1,10 @@
 #!/bin/bash
+
+cd /Users/misbahuddinabsarulislam/Desktop/BillTracker
+git pull
+cd frontend
+npm install
+cd ../
 brew services start mongodb/brew/mongodb-community
 npx kill-port 3000
 
