@@ -147,16 +147,16 @@ def pay_bill():
 
     # handle last days of the month
     replace_day = due_date.day
-    if (replace_day == 30 and next_month in [1,3,5,7,9,10,12]):
+    if replace_day == 30 and next_month in [1, 3, 5, 7, 9, 10, 12]:
         replace_day = 31
-    elif (replace_day == 31 and next_month in [2,4,6,8,11]):
+    elif replace_day == 31 and next_month in [2, 4, 6, 8, 11]:
         if next_month == 2:
             replace_day = 28
         else:
             replace_day = 30
-    elif (replace_day in [28,29] and next_month == 3):
+    elif replace_day in [28, 29] and next_month == 3:
         replace_day = 31
-        
+
     due_date = due_date.replace(day=1)
     due_date = due_date.replace(month=next_month)
     due_date = due_date.replace(day=replace_day)
@@ -216,6 +216,29 @@ def show_bill():
 
     collection.update_one({"account_id": data["account_id"]}, {"$set": {"shown": 1}})
     return {"success": 1}
+
+
+@app.route("/get_transactions_between_dates", methods=["POST"])
+def get_transactions_between_dates():
+    data = request.get_json()
+    connection = pymongo.MongoClient("mongodb://localhost:27017")
+    db = connection["BILL_TRACKER"]
+    collection = db["TRANSACTIONS"]
+
+    start_date = data["start_date"]
+    end_date = (
+        data["end_date"] if data["end_date"] else datetime.now().strftime("%m/%d/%Y")
+    )
+
+    transactions = []
+    for transaction in collection.find(
+        {"date": {"$gte": start_date, "$lte": end_date}}
+    ):
+        transaction["_id"] = str(transaction["_id"])
+        transactions.append(transaction)
+    transactions.reverse()
+
+    return jsonify({"transactions": transactions})
 
 
 @app.route("/admin/show_all_bills", methods=["PUT"])
