@@ -17,6 +17,20 @@ def hello_world():
     return "<h1>Hello world</h1>"
 
 
+def log_action(**kwargs):
+    connection = pymongo.MongoClient("mongodb://localhost:27017")
+    db = connection["BILL_TRACKER"]
+    collection = db["LOG"]
+
+    action = {
+        "action": kwargs["action"],
+        "date": datetime.now().strftime("%m/%d/%Y"),
+        "time": datetime.now().strftime("%H:%M:%S"),
+        "notes": kwargs["notes"],
+    }
+    collection.insert_one(action)
+
+
 @app.route("/get_all_bills", methods=["POST"])
 def get_all_bills():
     data = request.get_json()
@@ -29,7 +43,7 @@ def get_all_bills():
     for company in company_collection.find({"shown": {"$ne": 0}}):
         company["_id"] = str(company["_id"])
         companies.append(company)
-
+    # print(company)
     # sort by date
     companies.sort(key=lambda entry: datetime.strptime(entry["due_date"], "%m/%d/%Y"))
 
@@ -61,16 +75,16 @@ def get_all_bills():
             if company["overdue"] == 1:
                 continue
             else:
-                collection.update_one(
+                company_collection.update_one(
                     {"_id": ObjectId(company["_id"])}, {"$set": {"overdue": 1}}
                 )
             company["overdue"] = 1
         else:
             if company["overdue"]:
-                collection.update_one(
+                company_collection.update_one(
                     {"_id": ObjectId(company["_id"])}, {"$set": {"overdue": 0}}
                 )
-        print(company)
+    # log_action(action="/get_all_bills", notes="")
     return companies
 
 
@@ -83,6 +97,36 @@ def create_bill():
     db = connection["BILL_TRACKER"]
     collection = db["COMPANIES"]
     collection.insert_one(data)
+    log_action(action="/create_bill", notes=f"Created bill for {data['name']}")
+    return {"success": 1}
+
+
+@app.route("/edit_bill", methods=["POST"])
+def edit_bill():
+    data = request.get_json()
+    connection = pymongo.MongoClient("mongodb://localhost:27017")
+    db = connection["BILL_TRACKER"]
+    collection = db["COMPANIES"]
+
+    data_old = collection.find_one({"_id": ObjectId(data["_id"])})
+    if data["due_date"] != "":
+        due_date = datetime.strptime(data["due_date"], "%Y-%m-%d")
+        data["due_date"] = due_date.strftime("%m/%d/%Y")
+
+    for key in data:
+        if key != "_id":
+            if data[key] == "":
+                continue
+            else:
+                print(f"updating {key} to {data[key]} for {data['_id']}")
+                collection.update_one(
+                    {"_id": ObjectId(data["_id"])}, {"$set": {key: data[key]}}
+                )
+                data_new = collection.find_one({"_id": ObjectId(data["_id"])})
+    log_action(
+        action="/edit_bill",
+        notes=f"Edited bill for {data_new['name']}. Data Before: {data_old} --> Data After: {data_new}",
+    )
     return {"success": 1}
 
 
@@ -116,6 +160,11 @@ def get_transactions(bill_id):
     for transaction in collection.find({"bill_id": bill_id}):
         transaction["_id"] = str(transaction["_id"])
         transactions.append(transaction)
+    log_action(
+        action="/get_transactions",
+        notes=f"Retrieved transactions for {collection.find_one({'bill_id': bill_id})['name']}",
+    )
+
     return transactions
 
 
@@ -130,6 +179,7 @@ def get_all_transactions():
         transaction["_id"] = str(transaction["_id"])
         transactions.append(transaction)
     transactions.reverse()
+    # log_action(action="/get_all_transactions", notes="")
     return jsonify({"transactions": transactions})
 
 
@@ -182,6 +232,10 @@ def pay_bill():
     if due_date > now:
         collection.update_one({"account_id": account_id}, {"$set": {"overdue": 0}})
 
+    log_action(
+        action="/pay_bill",
+        notes=f"Paid bill for {bill['name']} for ${data['amount']}. Due date updated to {due_date}",
+    )
     return {"success": 1}
 
 
@@ -202,6 +256,10 @@ def delete_bill():
     db = connection["BILL_TRACKER"]
     collection = db["COMPANIES"]
     collection.update_one({"account_id": data["accountId"]}, {"$set": {"shown": 0}})
+    log_action(
+        action="/delete_bill",
+        notes=f"Deleted bill for {collection.find_one({'account_id': data['accountId']})['name']}",
+    )
     return {"success": 1}
 
 
@@ -239,7 +297,7 @@ def get_hidden_bills():
         company["transaction_count"] = count
         company["_id"] = str(company["_id"])
         companies.append(company)
-
+    # log_action(action="/get_hidden_bills", notes="")
     return jsonify({"companies": companies})
 
 
@@ -251,6 +309,10 @@ def show_bill():
     collection = db["COMPANIES"]
 
     collection.update_one({"account_id": data["account_id"]}, {"$set": {"shown": 1}})
+    # log_action(
+    #     action="/show_bill",
+    #     notes=f"Showed bill for {collection.find_one({'account_id': data['account_id']})['name']}",
+    # )
     return {"success": 1}
 
 
@@ -289,6 +351,10 @@ def get_transactions_between_dates():
         transactions.append(transaction)
 
     transactions.reverse()
+    # log_action(
+    #     action="/get_transactions_between_dates",
+    #     notes=f"Retrieved transactions between {begin_date} and {end_date}",
+    # )
     return jsonify({"transactions": transactions})
 
 
@@ -298,6 +364,7 @@ def show_all_bills():
     db = connection["BILL_TRACKER"]
     collection = db["COMPANIES"]
     collection.update_many({}, {"$set": {"shown": 1}})
+    log_action(action="/admin/show_all_bills", notes="Showed all bills")
     return {"success": 1}
 
 
