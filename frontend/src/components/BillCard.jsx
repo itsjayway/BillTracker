@@ -1,10 +1,14 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import Card from 'react-bootstrap/Card';
-import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
+import Modal from 'react-bootstrap/Modal';
+
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import Tooltip from '@mui/material/Tooltip';
 // import Row from 'react-bootstrap/esm/Row';
 // import Col from 'react-bootstrap/esm/Col';
 
@@ -256,12 +260,16 @@ function BillCard(props) {
           {data.name}
           {' '}
           <span style={{ marginLeft: 'auto' }}>
-            <Button variant="gray" onClick={handleEditShow}>
-              <b>...</b>
-            </Button>
-            <Button variant="gray" onClick={handleDelete(data.account_id)}>
-              X
-            </Button>
+            <Tooltip title="Edit">
+              <Button variant="gray" onClick={handleEditShow}>
+                <BorderColorIcon />
+              </Button>
+            </Tooltip>
+            <Tooltip title="Paid in Full">
+              <Button variant="gray" onClick={handleDelete(data.account_id)}>
+                <AssignmentTurnedInIcon />
+              </Button>
+            </Tooltip>
           </span>
         </Card.Header>
         <Card.Body>
