@@ -92,7 +92,14 @@ def get_all_bills():
 def create_bill():
     data = request.get_json()
     data["shown"] = 1
-    data["overdue"] = 1
+    if data["due_date"] != "":
+        due_date = datetime.strptime(data["due_date"], "%Y-%m-%d")
+        data["due_date"] = due_date.strftime("%m/%d/%Y")
+        now = datetime.now().strftime("%m/%d/%Y")
+        if data["due_date"] <= now:
+            data["overdue"] = 1
+        else:
+            data["overdue"] = 0
     connection = pymongo.MongoClient("mongodb://localhost:27017")
     db = connection["BILL_TRACKER"]
     collection = db["COMPANIES"]
