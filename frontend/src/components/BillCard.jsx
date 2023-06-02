@@ -267,6 +267,7 @@ function BillCard(props) {
           display: 'flex',
           width: '100%',
           height: '5vh',
+          minHeight: '60px',
           margin: '0',
         }}
         >
