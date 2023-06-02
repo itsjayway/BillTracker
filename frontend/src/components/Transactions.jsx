@@ -18,6 +18,25 @@ function Transactions() {
 
   const [dataSource, setDataSource] = useState([]);
 
+  function getWindowSize() {
+    const { innerWidth, innerHeight } = window;
+    return { innerWidth, innerHeight };
+  }
+
+  const [windowSize, setWindowSize] = useState(getWindowSize());
+
+  useEffect(() => {
+    function handleWindowResize() {
+      setWindowSize(getWindowSize());
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
+
   const columns = [
     {
       title: 'Name',
@@ -118,19 +137,27 @@ function Transactions() {
       </Form>
       {/* button to clear dates, set beginDate and endDate to '' and fetch all transactions */}
 
-      <h3>Transaction History</h3>
-      <span style={{
-        width: '100%', height: '400px', border: '1px solid black',
-      }}
-      >
-        {data.length > 0 && (
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={{ pageSize: 5 }}
-        />
-        )}
-      </span>
+      <h3>
+        Transaction History
+        height:
+        {' '}
+        {Math.floor((windowSize.innerHeight * 0.3) / 70) }
+      </h3>
+
+      {data.length > 0 && (
+        <span style={{
+          width: '100%', height: '32vh', minHeight: '300px',
+        }}
+        >
+          <Table
+            dataSource={dataSource}
+            columns={columns}
+            pagination={{ pageSize: Math.max(3, Math.floor((windowSize.innerHeight * 0.3) / 70)) }}
+            bordered
+
+          />
+        </span>
+      )}
       <h4>
         Total amount paid:
         $
