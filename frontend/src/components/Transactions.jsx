@@ -18,6 +18,12 @@ function Transactions() {
 
   const [dataSource, setDataSource] = useState([]);
 
+  const [allTransactionsShown, setAllTransactionsShown] = useState(true);
+
+  const handleToggleAllTransactions = () => {
+    setAllTransactionsShown(!allTransactionsShown);
+  };
+
   function getWindowSize() {
     const { innerWidth, innerHeight } = window;
     return { innerWidth, innerHeight };
@@ -142,17 +148,29 @@ function Transactions() {
       </h3>
 
       {data.length > 0 && (
-        <span style={{
-          width: '100%', height: '32vh', minHeight: '300px',
-        }}
-        >
-          <Table
-            dataSource={dataSource}
-            columns={columns}
-            pagination={{ pageSize: Math.max(3, Math.floor((windowSize.innerHeight * 0.3) / 70)) }}
-            bordered
-          />
-        </span>
+      <span style={
+            allTransactionsShown
+              ? { width: '100%', minHeight: '300px' }
+              : {
+                width: '100%', height: '32vh', minHeight: '300px',
+              }
+
+          }
+      >
+        <Table
+          dataSource={dataSource}
+          columns={columns}
+          pagination={
+            allTransactionsShown ? false
+              : {
+                pageSize:
+
+                Math.max(3, Math.floor((windowSize.innerHeight * 0.3) / 70)),
+              }
+            }
+          bordered
+        />
+      </span>
       )}
       <h4>
         Total amount paid:
