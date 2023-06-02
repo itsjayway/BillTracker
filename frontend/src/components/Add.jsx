@@ -19,11 +19,12 @@ function Add() {
     const data = {
       name: name || 'No name',
       account_id: acctNum || 'No account number',
-      due_date: selectedDate.toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-        year: 'numeric',
-      }) || 'No due date',
+      due_date:
+        selectedDate.toLocaleDateString('en-US', {
+          month: '2-digit',
+          day: '2-digit',
+          year: 'numeric',
+        }) || 'No due date',
       url: url || 'No URL',
     };
 

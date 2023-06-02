@@ -27,8 +27,7 @@ function Unshown() {
         hidden bills
       </Button>
 
-      {show
-        && (
+      {show && (
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -64,12 +63,7 @@ function Unshown() {
                     </b>
                   </i>
                 </td>
-                <td
-                  style={{ whiteSpace: 'pre-wrap' }}
-                >
-                  {bill.notes}
-
-                </td>
+                <td style={{ whiteSpace: 'pre-wrap' }}>{bill.notes}</td>
                 <td>
                   <Button
                     variant="primary"
@@ -84,7 +78,7 @@ function Unshown() {
                       })
                         .then((response) => response.json())
                         .then(() => {
-                        //   window.location.reload();
+                          //   window.location.reload();
                           alert('Refresh page to see changes');
                         });
                     }}
@@ -96,10 +90,8 @@ function Unshown() {
             ))}
           </tbody>
         </Table>
-        )}
-
+      )}
     </>
-
   );
 }
 
