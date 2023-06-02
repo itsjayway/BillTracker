@@ -172,8 +172,11 @@ function Transactions() {
         />
       </span>
       )}
-      <h4>
-        Total amount paid:
+      <h4 style={{
+        textAlign: 'center',
+      }}
+      >
+        Total amount paid (all-time):
         $
         {
         data.reduce((total, transaction) => total + parseFloat(transaction.amount), 0, 0).toFixed(2)
