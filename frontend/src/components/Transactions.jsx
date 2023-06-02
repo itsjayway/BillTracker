@@ -119,14 +119,18 @@ function Transactions() {
       {/* button to clear dates, set beginDate and endDate to '' and fetch all transactions */}
 
       <h3>Transaction History</h3>
-      {data.length > 0 && (
+      <span style={{
+        width: '100%', height: '400px', border: '1px solid black',
+      }}
+      >
+        {data.length > 0 && (
         <Table
           dataSource={dataSource}
           columns={columns}
           pagination={{ pageSize: 5 }}
         />
-      )}
-
+        )}
+      </span>
       <h4>
         Total amount paid:
         $
