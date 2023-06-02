@@ -1,6 +1,13 @@
 # BillTracker
 tool for bill payment scheduling
 ---
+Contributors:
+Jibran Absarulislam: https://github.com/jibranabsarulislam
+Mostafa Damir: https://github.com/mostafa-damir
+Kaleem Ullah: https://github.com/kaleemullah786
+
+---
+
 Install Node: https://nodejs.org/en
 
 Install Python: https://www.python.org/downloads/
