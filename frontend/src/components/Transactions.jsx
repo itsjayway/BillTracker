@@ -139,9 +139,6 @@ function Transactions() {
 
       <h3>
         Transaction History
-        height:
-        {' '}
-        {Math.floor((windowSize.innerHeight * 0.3) / 70) }
       </h3>
 
       {data.length > 0 && (
@@ -154,7 +151,6 @@ function Transactions() {
             columns={columns}
             pagination={{ pageSize: Math.max(3, Math.floor((windowSize.innerHeight * 0.3) / 70)) }}
             bordered
-
           />
         </span>
       )}
