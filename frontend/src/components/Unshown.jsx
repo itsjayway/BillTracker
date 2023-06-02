@@ -60,7 +60,7 @@ function Unshown() {
                   <i>
                     <b>
                       Total: $
-                      {bill.total_paid}
+                      {bill.total_paid.toFixed(2)}
                     </b>
                   </i>
                 </td>
