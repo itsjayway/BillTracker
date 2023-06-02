@@ -280,7 +280,7 @@ def get_hidden_bills():
 @app.route("/show_bill", methods=["PUT"])
 def show_bill():
     data = request.get_json()
-    TRANSACTIONS_COLLECTION.update_one(
+    COMPANIES_COLLECTION.update_one(
         {"account_id": data["account_id"]}, {"$set": {"shown": 1}}
     )
     # log_action(
