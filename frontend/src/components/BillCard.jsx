@@ -9,6 +9,7 @@ import Modal from 'react-bootstrap/Modal';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import Tooltip from '@mui/material/Tooltip';
+import { red } from '@mui/material/colors';
 // import Row from 'react-bootstrap/esm/Row';
 // import Col from 'react-bootstrap/esm/Col';
 
@@ -255,18 +256,55 @@ function BillCard(props) {
     <>
       {paymentModal}
       {editModal}
-      <Card key={data.key} style={{ width: '18rem', margin: '2em' }}>
-        <Card.Header style={{ display: 'flex' }}>
-          {data.name}
+      <Card
+        key={data.key}
+        style={{
+          width: '20rem',
+          margin: '2em',
+        }}
+      >
+        <Card.Header style={{
+          display: 'flex',
+          width: '100%',
+          height: '5vh',
+          margin: '0',
+        }}
+        >
+          <span style={{
+            display: 'flex',
+            width: '70%',
+            height: '100%',
+            overflow: 'clip',
+          }}
+          >
+            <Tooltip title={data?.name}>
+              <span>
+                {' '}
+                {data.name}
+              </span>
+            </Tooltip>
+          </span>
           {' '}
-          <span style={{ marginLeft: 'auto' }}>
+          <span style={{
+            display: 'flex',
+            width: '30%',
+            marginLeft: 'auto',
+            justifyContent: 'center',
+          }}
+          >
             <Tooltip title="Edit">
-              <Button variant="gray" onClick={handleEditShow}>
+              <Button
+                variant="gray"
+                onClick={handleEditShow}
+              >
                 <BorderColorIcon />
               </Button>
             </Tooltip>
             <Tooltip title="Paid in Full">
-              <Button variant="gray" onClick={handleDelete(data.account_id)}>
+              <Button
+                variant="gray"
+                onClick={handleDelete(data.account_id)}
+              >
                 <AssignmentTurnedInIcon />
               </Button>
             </Tooltip>
