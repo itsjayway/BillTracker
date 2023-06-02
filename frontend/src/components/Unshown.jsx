@@ -29,8 +29,12 @@ function Unshown() {
     <>
       <ToastContainer
         className="p-3"
-        position="top-end"
-        style={{ zIndex: 1 }}
+        style={{
+          position: 'fixed',
+          top: '1rem',
+          right: '1rem',
+          zIndex: 1,
+        }}
       >
         <Toast show={showToast} onClose={toggleShowToast}>
           <Toast.Header>
@@ -47,50 +51,73 @@ function Unshown() {
 
       {show
         && (
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Due Date</th>
-                <th>Account #</th>
-                <th>Put back?</th>
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Account #</th>
+              <th># of Transactions</th>
+              <th>Payments</th>
+              <th>Total Amount Paid</th>
+              <th>Last Note</th>
+              <th>Put back?</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.companies?.map((bill) => (
+              // eslint-disable-next-line no-underscore-dangle
+              <tr key={bill._id}>
+                <td>{bill.name}</td>
+                <td>{bill.account_id}</td>
+                <td>{bill.transaction_count}</td>
+                <td>{bill.last_paid_date}</td>
+                <td
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                    width: '400px',
+                  }}
+                >
+                  {bill.payments}
+                  {' '}
+                  <i>
+                    <b>
+                      Total: $
+                      {bill.total_paid}
+                    </b>
+                  </i>
+                </td>
+                <td
+                  style={{ whiteSpace: 'pre-wrap' }}
+                >
+                  {bill.notes}
+
+                </td>
+                <td>
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      fetch('/show_bill', {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ account_id: bill.account_id }),
+                        redirect: 'follow',
+                      })
+                        .then((response) => response.json())
+                        .then(() => {
+                        //   window.location.reload();
+                          toggleShowToast();
+                        });
+                    }}
+                  >
+                    Put back
+                  </Button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {data.companies.map((bill) => (
-                // eslint-disable-next-line no-underscore-dangle
-                <tr key={bill._id}>
-                  <td>{bill.name}</td>
-                  <td>{bill.amount}</td>
-                  <td>{bill.account_id}</td>
-                  <td>{bill.due_date}</td>
-                  <td>
-                    <Button
-                      variant="primary"
-                      onClick={() => {
-                        fetch('/show_bill', {
-                          method: 'PUT',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({ account_id: bill.account_id }),
-                          redirect: 'follow',
-                        })
-                          .then((response) => response.json())
-                          .then(() => {
-                            //   window.location.reload();
-                            toggleShowToast();
-                          });
-                      }}
-                    >
-                      Put back
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+            ))}
+          </tbody>
+        </Table>
         )}
 
     </>
