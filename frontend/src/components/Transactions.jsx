@@ -145,7 +145,21 @@ function Transactions() {
 
       <h3>
         Transaction History
+        {' '}
       </h3>
+      <span style={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'flex-end',
+      }}
+      >
+        <Button
+          variant="link"
+          onClick={handleToggleAllTransactions}
+        >
+          {`${allTransactionsShown ? 'Show less' : 'Show all'} transactions`}
+        </Button>
+      </span>
 
       {data.length > 0 && (
       <span style={
