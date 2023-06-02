@@ -81,7 +81,7 @@ function Add() {
           <InputGroup className="mb-3">
             <InputGroup.Text>Link to website</InputGroup.Text>
             <Form.Control
-              id="create-duedate"
+              id="create-url"
               aria-label="Website URL"
               onChange={(e) => setURL(e.target.value)}
               required

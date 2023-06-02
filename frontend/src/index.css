@@ -21,10 +21,8 @@ code {
 
 #inner {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin: 0 25px;
   overflow-y: scroll;
   height: 80vh;
-  max-height: 100vh;
+  max-height: 100vh; 
+  border: gray solid 2px;
 }
