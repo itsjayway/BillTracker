@@ -41,9 +41,7 @@ function BillCardGenerator() {
 
   return (
     <Container className="justify-content-center">
-      <Row>
-        {billArray}
-      </Row>
+      <Row>{billArray}</Row>
     </Container>
   );
 }

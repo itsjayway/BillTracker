@@ -18,6 +18,12 @@ function Transactions() {
 
   const [dataSource, setDataSource] = useState([]);
 
+  const [allTransactionsShown, setAllTransactionsShown] = useState(true);
+
+  const handleToggleAllTransactions = () => {
+    setAllTransactionsShown(!allTransactionsShown);
+  };
+
   function getWindowSize() {
     const { innerWidth, innerHeight } = window;
     return { innerWidth, innerHeight };
@@ -66,15 +72,17 @@ function Transactions() {
   ];
 
   useEffect(() => {
-    setDataSource(data.map((transaction, index) => ({
-      // eslint-disable-next-line no-underscore-dangle
-      key: `${transaction.account_id}-${index + 1}`,
-      name: transaction.name,
-      amount: transaction.amount,
-      date: transaction.date,
-      time: transaction.time,
-      notes: transaction.notes,
-    })));
+    setDataSource(
+      data.map((transaction, index) => ({
+        // eslint-disable-next-line no-underscore-dangle
+        key: `${transaction.account_id}-${index + 1}`,
+        name: transaction.name,
+        amount: transaction.amount,
+        date: transaction.date,
+        time: transaction.time,
+        notes: transaction.notes,
+      })),
+    );
   }, [data]);
 
   useEffect(() => {
@@ -96,9 +104,7 @@ function Transactions() {
 
   return (
     <>
-
       <Form>
-
         <Container>
           <Row>
             <Col>
@@ -137,29 +143,61 @@ function Transactions() {
       </Form>
       {/* button to clear dates, set beginDate and endDate to '' and fetch all transactions */}
 
-      <h3>
-        Transaction History
-      </h3>
+      <h3>Transaction History </h3>
+      <span
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <Button variant="link" onClick={handleToggleAllTransactions}>
+          {`${allTransactionsShown ? 'Show less' : 'Show all'} transactions`}
+        </Button>
+      </span>
 
       {data.length > 0 && (
-        <span style={{
-          width: '100%', height: '32vh', minHeight: '300px',
-        }}
+        <span
+          style={
+            allTransactionsShown
+              ? { width: '100%', minHeight: '300px' }
+              : {
+                width: '100%',
+                height: '32vh',
+                minHeight: '300px',
+              }
+          }
         >
           <Table
             dataSource={dataSource}
             columns={columns}
-            pagination={{ pageSize: Math.max(3, Math.floor((windowSize.innerHeight * 0.3) / 70)) }}
+            pagination={
+              allTransactionsShown
+                ? false
+                : {
+                  pageSize: Math.max(
+                    3,
+                    Math.floor((windowSize.innerHeight * 0.3) / 70),
+                  ),
+                }
+            }
             bordered
           />
         </span>
       )}
-      <h4>
-        Total amount paid:
-        $
-        {
-        data.reduce((total, transaction) => total + parseFloat(transaction.amount), 0, 0).toFixed(2)
-      }
+      <h4
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        Total amount paid (all-time): $
+        {data
+          .reduce(
+            (total, transaction) => total + parseFloat(transaction.amount),
+            0,
+            0,
+          )
+          .toFixed(2)}
       </h4>
     </>
   );

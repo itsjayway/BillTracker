@@ -17,8 +17,11 @@ function Home() {
       <Container id="inner">
         <BillCardGenerator />
       </Container>
+      <br />
       <Transactions />
+      <br />
       <Unshown />
+      <br />
     </Container>
   );
 }

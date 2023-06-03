@@ -9,7 +9,6 @@ function Summary() {
 
   useEffect(() => {
     fetch('/get_all_bills', {
-
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -17,7 +16,8 @@ function Summary() {
       body: JSON.stringify({
         summary: true,
       }),
-    }).then((response) => response.json())
+    })
+      .then((response) => response.json())
       .then((data) => setBills(data));
   }, []);
 
@@ -30,7 +30,9 @@ function Summary() {
         $
         {bill.last_transaction?.amount}
       </td>
-      <td><b>{bill.due_date}</b></td>
+      <td>
+        <b>{bill.due_date}</b>
+      </td>
       <td>{bill.last_transaction?.notes}</td>
     </tr>
   ));
@@ -41,14 +43,12 @@ function Summary() {
       <p>
         Generated on
         {' '}
-        {
-            new Date().toLocaleString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })
-        }
+        {new Date().toLocaleString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}
       </p>
       <Row>
         <Table striped bordered hover>
@@ -62,9 +62,7 @@ function Summary() {
               <th>Previous Transcation Note</th>
             </tr>
           </thead>
-          <tbody>
-            {billArray}
-          </tbody>
+          <tbody>{billArray}</tbody>
         </Table>
       </Row>
     </Container>
