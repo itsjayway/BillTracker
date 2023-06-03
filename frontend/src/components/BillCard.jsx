@@ -262,20 +262,22 @@ function BillCard(props) {
           margin: '2em',
         }}
       >
-        <Card.Header style={{
-          display: 'flex',
-          width: '100%',
-          height: '5vh',
-          minHeight: '60px',
-          margin: '0',
-        }}
-        >
-          <span style={{
+        <Card.Header
+          style={{
             display: 'flex',
-            width: '70%',
-            height: '100%',
-            overflow: 'clip',
+            width: '100%',
+            height: '5vh',
+            minHeight: '60px',
+            margin: '0',
           }}
+        >
+          <span
+            style={{
+              display: 'flex',
+              width: '70%',
+              height: '100%',
+              overflow: 'clip',
+            }}
           >
             <Tooltip title={data?.name}>
               <span>
@@ -285,26 +287,21 @@ function BillCard(props) {
             </Tooltip>
           </span>
           {' '}
-          <span style={{
-            display: 'flex',
-            width: '30%',
-            marginLeft: 'auto',
-            justifyContent: 'center',
-          }}
+          <span
+            style={{
+              display: 'flex',
+              width: '30%',
+              marginLeft: 'auto',
+              justifyContent: 'center',
+            }}
           >
             <Tooltip title="Edit">
-              <Button
-                variant="gray"
-                onClick={handleEditShow}
-              >
+              <Button variant="gray" onClick={handleEditShow}>
                 <BorderColorIcon />
               </Button>
             </Tooltip>
             <Tooltip title="Paid in Full">
-              <Button
-                variant="gray"
-                onClick={handleDelete(data.account_id)}
-              >
+              <Button variant="gray" onClick={handleDelete(data.account_id)}>
                 <AssignmentTurnedInIcon />
               </Button>
             </Tooltip>
