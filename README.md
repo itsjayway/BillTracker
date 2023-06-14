@@ -22,15 +22,18 @@ in your preferred terminal:
     git clone git@github.com:It-s-Saturday/BillTracker.git ists_BillTracker
     
 ### Create your virtual environment
-    cd backend
+    cd ists_BillTracker/backend
     python -m venv venv
     . ./venv/Scripts/activate # (on windows)
     . ./venv/bin/activate # (on mac)
     pip install -r requirements.txt
-
-### from root run:
-    ./w_run.sh # (or run frontend and backend separately as per your preference)
+    python main.py
     
+### Run frontend
+    cd ../frontend
+    npm install
+    npm start
+
 ## Homepage
 ![image](https://github.com/It-s-Saturday/BillTracker/assets/70596906/7d06a937-3a56-41ed-a3ce-cb6b02e067e5)
 
